@@ -15,7 +15,7 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
 export const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const productId = req.params.id
-    const product = await AppDataSource.getRepository(Product).findOne({ where: { id: productId } });
+    const product = await AppDataSource.getRepository(Product).findOne({ where: { productId: productId } });
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
       return;
@@ -28,13 +28,16 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const imageUpload = [];
-    for (let i = 0; i < req.files.length; i++) {
-      imageUpload[i] = req.files[i].filename;
+    const imageUpload: string[] = [];
+    
+    // Check if files are present
+    if (req.files && Array.isArray(req.files)) {
+      for (const file of req.files) {
+        imageUpload.push(file.filename);  // Push each file's filename
+      }
     }
-    const { name, price, color } = req.body;
-    console.log(req.body)
-    const product = AppDataSource.getRepository(Product).create({ name, price,images: imageUpload });
+    const { name, price, category, typeId,description } = req.body;
+    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description });
     await AppDataSource.getRepository(Product).save(product);
     res.status(201).json(product);
   } catch (error) {
@@ -46,7 +49,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
   try {
     const productId = req.params.id;
     const productRepository = AppDataSource.getRepository(Product);
-    const productToDelete = await productRepository.findOne({ where: { id: productId } });
+    const productToDelete = await productRepository.findOne({ where: { productId: productId } });
 
     if (!productToDelete) {
       res.status(404).json({ message: 'Product not found' });
@@ -67,7 +70,7 @@ export const deleteProductImage = async (req: Request, res: Response): Promise<v
     const productId = req.params.id;
     const imageUrlToDelete = req.params.imageId;
     const productRepository = AppDataSource.getRepository(Product);
-    const product = await productRepository.findOne({ where: { id: productId } });
+    const product = await productRepository.findOne({ where: { productId: productId } });
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
       return;
@@ -88,7 +91,7 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
 
     const productId = req.params.id;
     const productRepository = AppDataSource.getRepository(Product);
-    const productToUpdate = await productRepository.findOne({ where: { id: productId } });
+    const productToUpdate = await productRepository.findOne({ where: { productId: productId } });
     if (!productToUpdate) {
       res.status(404).json({ message: 'Product not found' });
       return;
