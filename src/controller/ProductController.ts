@@ -102,6 +102,15 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
     if (req.body.price) {
       productToUpdate.price = req.body.price;
     }
+    if (req.body.category) {
+      productToUpdate.category = req.body.category;
+    }
+    if (req.body.typeId) {
+      productToUpdate.typeId = req.body.typeId;
+    }
+    if (req.body.description) {
+      productToUpdate.description = req.body.description;
+    }
     if (req.files && req.files.length > 0) {
       const imageUpload = [];
       for (let i = 0; i < req.files.length; i++) {
