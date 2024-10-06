@@ -3,6 +3,7 @@ import { DataSource } from "typeorm"
 import { User } from "./entity/User"
 import { Product } from "./entity/product"
 import * as dotenv from "dotenv";
+import { Type } from "./entity/Type";
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
     username: 'default',
     password: process.env.PASSWORD,
     database: "verceldb",
-    entities: [User, Product],
+    entities: [User, Product,Type],
     synchronize: true,
     logging: false,
     ssl: true,
