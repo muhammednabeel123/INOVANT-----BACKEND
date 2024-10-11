@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Admin } from "./admin"
 
 @Entity()
 export class Type {
@@ -15,6 +16,11 @@ export class Type {
     @Column({ nullable: true, default: 0 })
     isActive: number
 
+    @Column('simple-array', { nullable: true })
+    images: string[];
+
+    @ManyToOne(() => Admin)
+    adminId: Admin;
 }
 
 
