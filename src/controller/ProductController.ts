@@ -6,6 +6,11 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
    
   try {
     const products = await AppDataSource.getRepository(Product).find();
+    for(let item of products){
+      if (Array.isArray(item.images)) {
+        item.images = item.images.map(image => `https://inovant.onrender.com/uploads/${image}`);
+      }
+      }
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products', error: error.message });
