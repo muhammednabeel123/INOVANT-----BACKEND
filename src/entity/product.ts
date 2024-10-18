@@ -26,4 +26,23 @@ export class Product {
 
   @Column('simple-array', { nullable: true })
   images: string[]; 
+
+  @Column({ nullable: true })
+  adminId: number;
+
+  @Column({ nullable: true })
+  isDeleted: number;
+
+  @Column({ nullable: true })
+  isActive: number;
+
+  @Column({ nullable: true })
+  createdAt: Date;
+
+  @Column({ default: 0 })
+  isFeatured: number;
+
+  @Column({ default: 0 })
+  isTodaySpecl: number;
+
 }

@@ -1,9 +1,10 @@
 import { UserController } from "./controller/UserController"
-import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById,} from './controller/ProductController';
+import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById, topPicksToggle, todaySpclToggle, getTopPicksProducts, getTodaySpecialProducts,} from './controller/ProductController';
 import express, { Request, Response } from "express";
 const router = express.Router();
 import { upload } from "./config/multer";
 import { createType, getAllTypes } from "./controller/TypeController";
+import { getAdminById, getAllAdmins, removeAdmin, saveAdmin } from "./controller/AdminController";
 
   
 router.get('/products',getAllProducts);
@@ -13,7 +14,16 @@ router.delete('/products/:id', deleteProduct);
 router.delete('/products/:id/images/:imageId', deleteProductImage);
 router.put('/edit-products/:id',upload,updateProductById);
 router.post('/add-type',upload,createType);
+router.put('/top-picks-toggle/:id',topPicksToggle);
+router.put('/today-spcl-toggle/:id',todaySpclToggle);
+router.get('/top-picks',getTopPicksProducts);
+router.get('/today-spcl',getTodaySpecialProducts);
 router.get('/types',getAllTypes);
+router.get('/admins', getAllAdmins);
+
+router.get('/admins/:id', getAdminById);
+router.post('/admins', saveAdmin);
+router.delete('/admins/:id', removeAdmin);
 
 
 export default router;

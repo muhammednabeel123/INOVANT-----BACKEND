@@ -130,6 +130,58 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
   } catch (error) {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
+}
+
+export const topPicksToggle = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const productId = req.params.id;
+    const productRepository = AppDataSource.getRepository(Product);
+    const productToUpdate = await productRepository.findOne({ where: { productId: productId } });
+    if (!productToUpdate) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+    productToUpdate.isFeatured = productToUpdate.isFeatured === 1 ? 0 : 1;
+    await productRepository.save(productToUpdate);
+    res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating product', error: error.message });
+  }
+};
+
+export const todaySpclToggle = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const productId = req.params.id;
+    const productRepository = AppDataSource.getRepository(Product);
+    const productToUpdate = await productRepository.findOne({ where: { productId: productId } });
+    if (!productToUpdate) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+    productToUpdate.isTodaySpecl = productToUpdate.isTodaySpecl === 1 ? 0 : 1;
+    await productRepository.save(productToUpdate);
+    res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating product', error: error.message });
+  }
+};
+
+export const getTopPicksProducts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const products = await AppDataSource.getRepository(Product).find({ where: { isFeatured: 1 } });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching top picks products', error: error.message });
+  }
+};
+
+export const getTodaySpecialProducts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaySpecl: 1 } });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching today special products', error: error.message });
+  }
 };
 
 
