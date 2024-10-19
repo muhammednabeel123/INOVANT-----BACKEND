@@ -15,7 +15,9 @@ dotenv.config();
 app.use(
   cors({
     credentials: true,
-    origin: process.env.BASE_URL,
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
   })
 );
 app.use('/uploads', express.static(join(__dirname, '..', 'src/uploads')));
