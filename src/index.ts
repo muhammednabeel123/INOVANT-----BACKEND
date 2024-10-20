@@ -24,11 +24,10 @@ app.use('/uploads', express.static(join(__dirname, '..', 'src/uploads')));
     AppDataSource.initialize().then(async () => {
       app.use('/',router);
        
-        app.listen(3000, async () => {
+        app.listen(3001, async () => {
           console.log('Server has started');
       
         });
       }).catch(error => console.log(error));
       
-
 

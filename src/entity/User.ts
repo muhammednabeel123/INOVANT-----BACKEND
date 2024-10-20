@@ -2,10 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 
 @Entity()
 export class User {
-    static find() {
-        throw new Error("Method not implemented.")
-    }
-
     @PrimaryGeneratedColumn()
     id: number
 
@@ -18,4 +14,6 @@ export class User {
     @Column()
     age: number
 
+    @Column('bigint')
+    phoneNo: number
 }

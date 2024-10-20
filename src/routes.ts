@@ -1,10 +1,10 @@
-import { UserController } from "./controller/UserController"
 import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById, topPicksToggle, todaySpclToggle, getTopPicksProducts, getTodaySpecialProducts,} from './controller/ProductController';
 import express, { Request, Response } from "express";
 const router = express.Router();
 import { upload } from "./config/multer";
 import { createType, getAllTypes } from "./controller/TypeController";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin } from "./controller/AdminController";
+import { getAllUsers, removeUser, saveUser, sendOtp, verifyOtp } from './controller/UserController';
 
   
 router.get('/products',getAllProducts);
@@ -25,5 +25,12 @@ router.get('/admins/:id', getAdminById);
 router.post('/admins', saveAdmin);
 router.delete('/admins/:id', removeAdmin);
 
+router.get('/users', getAllUsers);
+
+router.post('/user', saveUser);
+router.delete('/user/:id', removeUser);
+
+router.post('/send-otp', sendOtp);
+router.post('/verify-otp', verifyOtp);
 
 export default router;
