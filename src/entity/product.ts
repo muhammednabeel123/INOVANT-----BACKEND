@@ -30,10 +30,10 @@ export class Product {
   @Column({ nullable: true })
   adminId: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0, nullable: true })
   isDeleted: number;
 
-  @Column({ nullable: true })
+  @Column({  default: 1, nullable: true })
   isActive: number;
 
   @Column({ nullable: true })

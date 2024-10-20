@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Product } from '../entity/product'; 
 import { AppDataSource } from '../data-source';
+import { Type } from '../entity/Type';
 
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
    
@@ -10,6 +11,8 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
       if (Array.isArray(item.images)) {
         item.images = item.images.map(image => `https://inovant.onrender.com/uploads/${image}`);
       }
+      let types = await AppDataSource.getRepository(Type).find({ where: { typeId: item.typeId } });
+        item['typeName'] = types[0].name
       }
     res.status(200).json(products);
   } catch (error) {
@@ -34,17 +37,15 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const imageUpload: string[] = [];
-      
-    console.log(req.files,'req.files');
-    console.log(req.body,'req.body');
+  
     // Check if files are present
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files) {
         imageUpload.push(file.filename);  // Push each file's filename
       }
     }
-    const { name, price, category, typeId,description } = req.body;
-    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description });
+    const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isFeatured } = req.body;
+    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isFeatured,isTodaySpecl,createdAt: new Date() });
     await AppDataSource.getRepository(Product).save(product);
     res.status(201).json(product);
   } catch (error) {
@@ -124,6 +125,18 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
         imageUpload[i] = req.files[i].filename;
         productToUpdate.images.push(imageUpload[i]) ;
       }   
+    }
+    if(req.body.isDeleted){
+      productToUpdate.isDeleted = req.body.isDeleted;
+    }
+    if(req.body.isActive){
+      productToUpdate.isActive = req.body.isActive;
+    }
+    if(req.body.isTodaySpecl){
+      productToUpdate.isTodaySpecl = req.body.isTodaySpecl;
+    }
+    if(req.body.isFeatured){
+      productToUpdate.isFeatured = req.body.isFeatured;
     }
 
     await productRepository.save(productToUpdate);
