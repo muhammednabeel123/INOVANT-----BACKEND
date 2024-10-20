@@ -11,18 +11,18 @@ export const AppDataSource = new DataSource({
     type: "postgres",
     host: process.env.HOST,
     port: 5432,
-    username: 'postgres',
-    password:'1234',
-    database: "Menu-ordering",
+    username: 'default',
+    password: process.env.PASSWORD,
+    database: "verceldb",
     entities: [User, Product,Type,Admin],
     synchronize: true,
     logging: false,
-    ssl: false,
-    // extra: {
-    //     ssl: {
-    //         rejectUnauthorized: false
-    //     }
-    // },
+    ssl: true,
+    extra: {
+        ssl: {
+            rejectUnauthorized: false
+        }
+    },
     migrations: [],
     subscribers: [],
 })

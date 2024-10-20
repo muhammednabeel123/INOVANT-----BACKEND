@@ -34,9 +34,7 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const imageUpload: string[] = [];
-      
-    console.log(req.files,'req.files');
-    console.log(req.body,'req.body');
+    
     // Check if files are present
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files) {
