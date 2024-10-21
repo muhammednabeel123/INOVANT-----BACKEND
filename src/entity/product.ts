@@ -40,7 +40,7 @@ export class Product {
   createdAt: Date;
 
   @Column({ default: 0 })
-  isFeatured: number;
+  isTodaysMenu: number;
 
   @Column({ default: 0 })
   isTodaySpecl: number;

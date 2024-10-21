@@ -44,8 +44,8 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
         imageUpload.push(file.filename);  // Push each file's filename
       }
     }
-    const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isFeatured } = req.body;
-    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isFeatured,isTodaySpecl,createdAt: new Date() });
+    const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isTodaysMenu } = req.body;
+    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isTodaysMenu,isTodaySpecl,createdAt: new Date() });
     await AppDataSource.getRepository(Product).save(product);
     res.status(201).json(product);
   } catch (error) {
@@ -136,7 +136,7 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
       productToUpdate.isTodaySpecl = req.body.isTodaySpecl;
     }
     if(req.body.isFeatured){
-      productToUpdate.isFeatured = req.body.isFeatured;
+      productToUpdate.isTodaysMenu  = req.body.isTodaysMenu;
     }
 
     await productRepository.save(productToUpdate);
@@ -156,7 +156,7 @@ export const topPicksToggle = async (req: Request, res: Response): Promise<void>
       res.status(404).json({ message: 'Product not found' });
       return;
     }
-    productToUpdate.isFeatured = productToUpdate.isFeatured === 1 ? 0 : 1;
+    productToUpdate.isTodaysMenu = productToUpdate.isTodaysMenu === 1 ? 0 : 1;
     await productRepository.save(productToUpdate);
     res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
   } catch (error) {
@@ -183,7 +183,7 @@ export const todaySpclToggle = async (req: Request, res: Response): Promise<void
 
 export const getTopPicksProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const products = await AppDataSource.getRepository(Product).find({ where: { isFeatured: 1 } });
+    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaysMenu: 1 } });
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching top picks products', error: error.message });
