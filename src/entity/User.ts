@@ -14,6 +14,6 @@ export class User {
     @Column()
     age: number
 
-    @Column('bigint')
+    @Column('bigint', { nullable: true })
     phoneNo: number
 }
