@@ -4,10 +4,10 @@ import { User } from "../entity/User"
 import { randomInt } from "crypto";
 import jwt from "jsonwebtoken";
 
-const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SERVICE_SID } = process.env;
-const client = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
-    lazyLoading: true
-})
+// const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SERVICE_SID } = process.env;
+// const client = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
+//     lazyLoading: true
+// })
 
 export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -84,16 +84,16 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
             return response.status(404).send("User not found");
         }
 
-        const otpResponse = await client.verify
-            .v2.services(TWILIO_SERVICE_SID)
-            .verifications.create({
-                to: `+91${phoneNumber}`,
-                channel: 'sms'
-            });
+        // const otpResponse = await client.verify
+        //     .v2.services(TWILIO_SERVICE_SID)
+        //     .verifications.create({
+        //         to: `+91${phoneNumber}`,
+        //         channel: 'sms'
+        //     });
 
-        if (otpResponse) {
-            return response.status(200).send("OTP sent and expiration updated successfully");
-        }
+        // if (otpResponse) {
+        //     return response.status(200).send("OTP sent and expiration updated successfully");
+        // }
 
     } catch (error) {
         console.error("Error sending OTP:", error);
@@ -113,29 +113,29 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
             return response.status(404).send("User not found");
         }
 
-        const verifiedResponse = await client.verify
-            .v2.services(TWILIO_SERVICE_SID)
-            .verificationChecks.create({
-                to: `+91${phoneNumber}`,
-                code: otp
-            });
+        // const verifiedResponse = await client.verify
+        //     .v2.services(TWILIO_SERVICE_SID)
+        //     .verificationChecks.create({
+        //         to: `+91${phoneNumber}`,
+        //         code: otp
+        //     });
 
-        if (verifiedResponse) {
-            const token = jwt.sign(
-                {
-                    userId: user.id,
-                    phoneNo: user.phoneNo,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                },
-                process.env.JWT_SECRET
-            );
+        // if (verifiedResponse) {
+        //     const token = jwt.sign(
+        //         {
+        //             userId: user.id,
+        //             phoneNo: user.phoneNo,
+        //             firstName: user.firstName,
+        //             lastName: user.lastName,
+        //         },
+        //         process.env.JWT_SECRET
+        //     );
 
-            return response.status(200).json({
-                message: "OTP verified successfully",
-                token
-            });
-        }
+        //     return response.status(200).json({
+        //         message: "OTP verified successfully",
+        //         token
+        //     });
+        // }
 
     } catch (error) {
         console.error("Error verifying OTP:", error);

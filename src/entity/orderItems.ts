@@ -6,7 +6,7 @@ import { Product } from "./product"
 export class OrderItems {
 
     @PrimaryGeneratedColumn()
-    id: number
+    orderItemId: number
 
     @Column()
     orderId: number
@@ -14,8 +14,8 @@ export class OrderItems {
     @Column()
     quantity: number
 
-    @ManyToOne(() => Product)
-    productId: Product
+    @Column()
+    productId: number
 
     @Column()
     createdAt: Date

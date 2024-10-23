@@ -5,6 +5,8 @@ import { Product } from "./entity/product"
 import * as dotenv from "dotenv";
 import { Type } from "./entity/Type";
 import { Admin } from "./entity/admin";
+import { OrderItems } from "./entity/orderItems";
+import { Orders } from "./entity/order";
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -12,9 +14,9 @@ export const AppDataSource = new DataSource({
     host: process.env.HOST,
     port: 5432,
     username: 'default',
-    password: process.env.PASSWORD,
+    password: 'jMfIREP1nWe6',
     database: "verceldb",
-    entities: [User, Product,Type,Admin],
+    entities: [User, Product,Type,Admin,OrderItems,Orders],
     synchronize: true,
     logging: false,
     ssl: true,

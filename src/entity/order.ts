@@ -5,20 +5,29 @@ import { User } from "./User"
 export class Orders {
 
     @PrimaryGeneratedColumn()
-    id: number
+    orderId: number
 
     @Column()
     orderNo: number
 
-    @ManyToOne(() => User)
-    userId: User
-
     @Column()
-    isProcessed: Boolean
+    userId: number
+
+    @Column({ default: 0, nullable: true })
+    isProcessed:number
 
     @Column()
     createdAt: Date
 
     @Column()
     updatedAt: Date
+
+    @Column({
+        type: 'enum',
+        enum: ['U', 'T'], //U = User, T = Table
+        default:'T',
+        nullable: true,
+    })
+    orderType: 'U' | 'D'
+
 }
