@@ -79,9 +79,9 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
             const phoneNumberRegex = /^\d{10}$/;
 
             if (!phoneNumberRegex.test(phoneNumber)) {
-                return response.status(400).json({
+                return response.status(401).json({
                     errorMessage: "Phone number must be exactly 10 digits.",
-                    errorCode: 400
+                    errorCode: 401
                 });
             }
 
@@ -109,15 +109,17 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                 });
             }
         } else {
-            return response.status(404).json({
+            return response.status(401).json({
                 errorMessage: "Phone Number not provided",
-                errorCode: 404
+                errorCode: 401
             });
         }
     } catch (error) {
-        return response.status(500).json({
+        console.log(error);
+        
+        return response.status(401).json({
             errorMessage: "An error occurred while sending OTP",
-            errorCode: 500
+            errorCode: 401
         });
     }
 };
