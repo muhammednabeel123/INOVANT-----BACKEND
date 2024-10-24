@@ -71,39 +71,48 @@ export const removeUser = async (request: Request, response: Response, next: Nex
     }
 };
 
-
 export const sendOtp = async (request: Request, response: Response, next: NextFunction) => {
     const { phoneNumber, userName } = request.body;
 
     try {
         if (userName && phoneNumber) {
+            // Check if both username and phone number exist together
             const userUpdateResult = await AppDataSource.getRepository(User).findOne(
                 { where: { phoneNo: phoneNumber, userName: userName } }
             );
 
             if (!userUpdateResult) {
-                const oneDetailFounded = await AppDataSource.getRepository(User).findOne(
-                    {
-                        where: [
-                            { userName: userName },
-                            { phoneNo: phoneNumber },
-                        ]
-                    }
+                // Check if the username exists independently
+                const userWithSameUsername = await AppDataSource.getRepository(User).findOne(
+                    { where: { userName: userName } }
                 );
 
-                if (oneDetailFounded) {
-                    return response.status(404).send("One of the provided detail is wrong");
-                } else {
-                    await AppDataSource.getRepository(User).save(
-                        {
-                            userName: userName,
-                            phoneNo: phoneNumber
-                        }
-                    )
+                // Check if the phone number exists independently
+                const userWithSamePhoneNumber = await AppDataSource.getRepository(User).findOne(
+                    { where: { phoneNo: phoneNumber } }
+                );
+
+                // Return specific error messages for each case
+                if (userWithSameUsername && !userWithSamePhoneNumber) {
+                    return response.status(404).send("The username already exists, but the phone number does not match.");
                 }
 
+                if (!userWithSameUsername && userWithSamePhoneNumber) {
+                    return response.status(404).send("The phone number already exists, but the username does not match.");
+                }
+
+                if (userWithSameUsername && userWithSamePhoneNumber) {
+                    return response.status(404).send("One of the provided details is incorrect.");
+                } else {
+                    // Save the user if neither detail exists
+                    await AppDataSource.getRepository(User).save({
+                        userName: userName,
+                        phoneNo: phoneNumber
+                    });
+                }
             }
 
+            // Send OTP using Twilio
             const otpResponse = await client.verify
                 .v2.services(TWILIO_SERVICE_SID)
                 .verifications.create({
@@ -115,13 +124,14 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                 return response.status(200).send("OTP sent and expiration updated successfully");
             }
         } else {
-            return response.status(404).send("User Name/ Phone No not provided");
+            return response.status(404).send("User Name/Phone Number not provided");
         }
     } catch (error) {
         console.error("Error sending OTP:", error);
         return response.status(500).send("An error occurred while sending OTP");
     }
 };
+
 
 export const verifyOtp = async (request: Request, response: Response, next: NextFunction) => {
     const { phoneNumber, otp } = request.body;
