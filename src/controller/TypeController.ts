@@ -1,15 +1,18 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { Type } from '../entity/Type';
+import { cloudinaryImageUploadMethod } from '../config/multer';
 
 export const createType = async (req: Request, res: Response): Promise<void> => {
     try {
-        const imageUpload: string[] = [];
+        const imageUpload = [];
 
         // Check if files are present
         if (req.files && Array.isArray(req.files)) {
             for (const file of req.files) {
-                imageUpload.push(file.filename);  // Push each file's filename
+                const { path } = file
+                const newPath = await cloudinaryImageUploadMethod(path)
+                imageUpload.push(newPath);
             }
         }
         const { name } = req.body;

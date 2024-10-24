@@ -72,12 +72,10 @@ export const removeUser = async (request: Request, response: Response, next: Nex
 };
 
 export const sendOtp = async (request: Request, response: Response, next: NextFunction) => {
-    const { phoneNumber, userName } = request.body;
+    const { phoneNumber } = request.body;
 
     try {
-        // Check if phoneNumber and userName are provided
-        if (userName && phoneNumber) {
-            // Ensure phoneNumber consists of exactly 10 digits and is numeric
+        if (phoneNumber) {
             const phoneNumberRegex = /^\d{10}$/;
 
             if (!phoneNumberRegex.test(phoneNumber)) {
@@ -88,34 +86,11 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
             }
 
             const userUpdateResult = await AppDataSource.getRepository(User).findOne(
-                { where: { phoneNo: phoneNumber, userName: userName } }
+                { where: { phoneNo: phoneNumber } }
             );
 
             if (!userUpdateResult) {
-                const userWithSameUsername = await AppDataSource.getRepository(User).findOne(
-                    { where: { userName: userName } }
-                );
-
-                const userWithSamePhoneNumber = await AppDataSource.getRepository(User).findOne(
-                    { where: { phoneNo: phoneNumber } }
-                );
-
-                if (userWithSameUsername && !userWithSamePhoneNumber) {
-                    return response.status(404).json({
-                        errorMessage: "The username already exists, but the phone number does not match.",
-                        errorCode: 404
-                    });
-                }
-
-                if (!userWithSameUsername && userWithSamePhoneNumber) {
-                    return response.status(404).json({
-                        errorMessage: "The phone number already exists, but the username does not match.",
-                        errorCode: 404
-                    });
-                }
-
                 await AppDataSource.getRepository(User).save({
-                    userName: userName,
                     phoneNo: phoneNumber
                 });
             }
@@ -129,18 +104,17 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
 
             if (otpResponse) {
                 return response.status(200).json({
-                    errorMessage: "OTP sent and expiration updated successfully",
+                    message: "OTP sent successfully",
                     errorCode: 200
                 });
             }
         } else {
             return response.status(404).json({
-                errorMessage: "User Name/Phone Number not provided",
+                errorMessage: "Phone Number not provided",
                 errorCode: 404
             });
         }
     } catch (error) {
-        console.error("Error sending OTP:", error);
         return response.status(500).json({
             errorMessage: "An error occurred while sending OTP",
             errorCode: 500
@@ -160,7 +134,10 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
         });
 
         if (!user) {
-            return response.status(404).send("User not found");
+            return response.status(404).send({
+                errorMessage: "No User found.",
+                errorCode: 403
+            });
         }
 
         const verifiedResponse = await client.verify
@@ -182,6 +159,7 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
 
             return response.status(200).json({
                 message: "OTP verified successfully",
+                status:200,
                 token
             });
 
