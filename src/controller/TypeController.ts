@@ -32,7 +32,7 @@ export const getAllTypes = async (req: Request, res: Response): Promise<void> =>
             }
             result.push(d)
         }
-        res.status(200).json(result);
+        res.status(201).json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching types', error: error.message });
     }

@@ -14,7 +14,7 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
       let types = await AppDataSource.getRepository(Type).find({ where: { typeId: item.typeId } });
         item['typeName'] = types[0].name
       }
-    res.status(200).json(products);
+    res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
@@ -28,7 +28,7 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
       res.status(404).json({ message: 'Product not found' });
       return;
     }
-    res.status(200).json(product);
+    res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching product', error: error.message });
   }
@@ -85,7 +85,7 @@ export const deleteProductImage = async (req: Request, res: Response): Promise<v
     }
     product.images = product.images.filter((image) => image !== imageUrlToDelete);
     await productRepository.save(product);
-    res.status(200).json({ message: 'Product image deleted successfully' });
+    res.status(201).json({ message: 'Product image deleted successfully' });
   } catch (error) {
     console.error('Error deleting product image:', error);
     res.status(500).json({ message: 'Error deleting product image', error: error.message });
@@ -141,7 +141,7 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
 
     await productRepository.save(productToUpdate);
 
-    res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
+    res.status(201).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
   } catch (error) {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
@@ -158,7 +158,7 @@ export const topPicksToggle = async (req: Request, res: Response): Promise<void>
     }
     productToUpdate.isTodaysMenu = productToUpdate.isTodaysMenu === 1 ? 0 : 1;
     await productRepository.save(productToUpdate);
-    res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
+    res.status(201).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
   } catch (error) {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
@@ -175,7 +175,7 @@ export const todaySpclToggle = async (req: Request, res: Response): Promise<void
     }
     productToUpdate.isTodaySpecl = productToUpdate.isTodaySpecl === 1 ? 0 : 1;
     await productRepository.save(productToUpdate);
-    res.status(200).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
+    res.status(201).json({ message: 'Product updated successfully', updatedProduct: productToUpdate });
   } catch (error) {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
@@ -184,7 +184,7 @@ export const todaySpclToggle = async (req: Request, res: Response): Promise<void
 export const getTopPicksProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = await AppDataSource.getRepository(Product).find({ where: { isTodaysMenu: 1 } });
-    res.status(200).json(products);
+    res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching top picks products', error: error.message });
   }
@@ -193,7 +193,7 @@ export const getTopPicksProducts = async (req: Request, res: Response): Promise<
 export const getTodaySpecialProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const products = await AppDataSource.getRepository(Product).find({ where: { isTodaySpecl: 1 } });
-    res.status(200).json(products);
+    res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching today special products', error: error.message });
   }

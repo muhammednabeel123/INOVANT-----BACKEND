@@ -109,26 +109,22 @@ export const addItemToOrder = async (request: Request, response: Response, next:
 export const getOrderDetails = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.params.orderId);
-
         const order = await AppDataSource.getRepository(Orders).findOne({
             where: { orderId: orderId },
             // relations: ["userId"]
         });
-
         if (!order) {
             return response.status(404).send("Order not found");
         }
-
         const orderItems = await AppDataSource.getRepository(OrderItems).find({
             where: { orderId },
         });
-
         let result = []
         for (let item of orderItems) {
             const product = await AppDataSource.getRepository(Product).findOne({ where: { productId: item.productId } });
             let d = {
                 orderId: item.orderId,
-                orderItemId:item.orderItemId,
+                orderItemId: item.orderItemId,
                 productId: item.productId,
                 quantity: item.quantity,
                 image: product?.images ? `https://inovant.onrender.com/uploads/${product?.images}` : null,
@@ -137,16 +133,14 @@ export const getOrderDetails = async (request: Request, response: Response, next
             }
             result.push(d)
         }
-
         let successRespone = {
             data: result,
             message: "Order details fetched successfully",
-            status: 200
+            status: 201
         }
-
-        return response.status(200).send(successRespone)
+        return response.status(201).send(successRespone)
     } catch (error) {
-        next(error);
+        return response.status(500).send("An error occurred while fetching order details");
     }
 };
 
@@ -160,28 +154,24 @@ export const checkout = async (request: Request, response: Response, next: NextF
         order.isProcessed = 1;
         order.updatedAt = new Date();
         const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
-        return response.status(200).json(updatedOrder);
+        return response.status(201).json(updatedOrder);
     } catch (error) {
-        next(error);
+        return response.status(500).send("An error occurred while fetching order details");
     }
 };
 
 export const cancelOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.params.orderId);
-
         const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId: orderId } });
-
         if (!order) {
             return response.status(404).send("Order not found");
         }
-
         if (order.isProcessed) {
-            return response.status(400).send("Processed orders cannot be canceled");
+            return response.status(201).send("Processed orders cannot be canceled");
         }
-
         await AppDataSource.getRepository(Orders).remove(order);
-        return response.status(200).send("Order has been canceled successfully");
+        return response.status(201).send("Order has been canceled successfully");
     } catch (error) {
         next(error);
     }
