@@ -4,7 +4,7 @@ const router = express.Router();
 import { upload } from "./config/multer";
 import { createType, getAllTypes } from "./controller/TypeController";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin } from "./controller/AdminController";
-import { getAllUsers, removeUser, saveUser, sendOtp, verifyOtp } from './controller/UserController';
+import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getOrderDetails } from './controller/OrderController';
 
   
@@ -27,7 +27,7 @@ router.post('/admins', saveAdmin);
 router.delete('/admins/:id', removeAdmin);
 
 router.get('/users', getAllUsers);
-router.post('/user', saveUser);
+router.patch('/user', updateUser);
 router.delete('/user/:id', removeUser);
 
 router.post('/send-otp', sendOtp);

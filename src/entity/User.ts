@@ -3,17 +3,21 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    id: number
+    userId: number
 
     @Column()
+    userName: string
+
+    @Column({ nullable: true })
     firstName: string
 
-    @Column()
+    @Column({ nullable: true })
     lastName: string
 
-    @Column()
+    @Column({ nullable: true })
     age: number
 
-    @Column('bigint', { nullable: true })
+    @Column('bigint')
     phoneNo: number
+
 }
