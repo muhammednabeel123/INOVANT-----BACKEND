@@ -75,7 +75,18 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
     const { phoneNumber, userName } = request.body;
 
     try {
+        // Check if phoneNumber and userName are provided
         if (userName && phoneNumber) {
+            // Ensure phoneNumber consists of exactly 10 digits and is numeric
+            const phoneNumberRegex = /^\d{10}$/;
+
+            if (!phoneNumberRegex.test(phoneNumber)) {
+                return response.status(400).json({
+                    errorMessage: "Phone number must be exactly 10 digits.",
+                    errorCode: 400
+                });
+            }
+
             const userUpdateResult = await AppDataSource.getRepository(User).findOne(
                 { where: { phoneNo: phoneNumber, userName: userName } }
             );
@@ -103,7 +114,6 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                     });
                 }
 
-
                 await AppDataSource.getRepository(User).save({
                     userName: userName,
                     phoneNo: phoneNumber
@@ -122,11 +132,6 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                     errorMessage: "OTP sent and expiration updated successfully",
                     errorCode: 200
                 });
-            } else {
-                return response.status(100).json({
-                    errorMessage: "OTP sent but could not update expiration",
-                    errorCode: 100
-                });
             }
         } else {
             return response.status(404).json({
@@ -142,6 +147,7 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
         });
     }
 };
+
 
 
 
