@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Product } from '../entity/product'; 
 import { AppDataSource } from '../data-source';
 import { Type } from '../entity/Type';
+import { cloudinaryImageUploadMethod } from '../config/multer';
 
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
    
@@ -9,7 +10,7 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
     const products = await AppDataSource.getRepository(Product).find();
     for(let item of products){
       if (Array.isArray(item.images)) {
-        item.images = item.images.map(image => `https://inovant.onrender.com/uploads/${image}`);
+        item.images = item.images.map(image => image);
       }
       let types = await AppDataSource.getRepository(Type).find({ where: { typeId: item.typeId } });
         item['typeName'] = types[0].name
@@ -36,12 +37,14 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const imageUpload: string[] = [];
+    const imageUpload = [];
   
     // Check if files are present
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files) {
-        imageUpload.push(file.filename);  // Push each file's filename
+        const { path } = file
+        const newPath = await cloudinaryImageUploadMethod(path)
+        imageUpload.push(newPath);
       }
     }
     const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isTodaysMenu } = req.body;
@@ -122,7 +125,9 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
     if (req.files && req.files.length > 0) {
       const imageUpload = [];
       for (let i = 0; i < req.files.length; i++) {
-        imageUpload[i] = req.files[i].filename;
+        const { path } = req.files[i];
+        const newPath = await cloudinaryImageUploadMethod(path)
+        imageUpload[i] = newPath;
         productToUpdate.images.push(imageUpload[i]) ;
       }   
     }
