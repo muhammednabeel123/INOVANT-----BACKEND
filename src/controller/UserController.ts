@@ -103,17 +103,11 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                     });
                 }
 
-                if (userWithSameUsername && userWithSamePhoneNumber) {
-                    return response.status(404).json({
-                        errorMessage: "One of the provided details is incorrect.",
-                        errorCode: 404
-                    });
-                } else {
-                    await AppDataSource.getRepository(User).save({
-                        userName: userName,
-                        phoneNo: phoneNumber
-                    });
-                }
+
+                await AppDataSource.getRepository(User).save({
+                    userName: userName,
+                    phoneNo: phoneNumber
+                });
             }
 
             const otpResponse = await client.verify
