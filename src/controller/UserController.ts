@@ -76,35 +76,39 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
 
     try {
         if (userName && phoneNumber) {
-            // Check if both username and phone number exist together
             const userUpdateResult = await AppDataSource.getRepository(User).findOne(
                 { where: { phoneNo: phoneNumber, userName: userName } }
             );
 
             if (!userUpdateResult) {
-                // Check if the username exists independently
                 const userWithSameUsername = await AppDataSource.getRepository(User).findOne(
                     { where: { userName: userName } }
                 );
 
-                // Check if the phone number exists independently
                 const userWithSamePhoneNumber = await AppDataSource.getRepository(User).findOne(
                     { where: { phoneNo: phoneNumber } }
                 );
 
-                // Return specific error messages for each case
                 if (userWithSameUsername && !userWithSamePhoneNumber) {
-                    return response.status(404).send("The username already exists, but the phone number does not match.");
+                    return response.status(404).json({
+                        errorMessage: "The username already exists, but the phone number does not match.",
+                        errorCode: 404
+                    });
                 }
 
                 if (!userWithSameUsername && userWithSamePhoneNumber) {
-                    return response.status(404).send("The phone number already exists, but the username does not match.");
+                    return response.status(404).json({
+                        errorMessage: "The phone number already exists, but the username does not match.",
+                        errorCode: 404
+                    });
                 }
 
                 if (userWithSameUsername && userWithSamePhoneNumber) {
-                    return response.status(404).send("One of the provided details is incorrect.");
+                    return response.status(404).json({
+                        errorMessage: "One of the provided details is incorrect.",
+                        errorCode: 404
+                    });
                 } else {
-                    // Save the user if neither detail exists
                     await AppDataSource.getRepository(User).save({
                         userName: userName,
                         phoneNo: phoneNumber
@@ -112,7 +116,6 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                 }
             }
 
-            // Send OTP using Twilio
             const otpResponse = await client.verify
                 .v2.services(TWILIO_SERVICE_SID)
                 .verifications.create({
@@ -121,16 +124,31 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
                 });
 
             if (otpResponse) {
-                return response.status(200).send("OTP sent and expiration updated successfully");
+                return response.status(200).json({
+                    errorMessage: "OTP sent and expiration updated successfully",
+                    errorCode: 200
+                });
+            } else {
+                return response.status(100).json({
+                    errorMessage: "OTP sent but could not update expiration",
+                    errorCode: 100
+                });
             }
         } else {
-            return response.status(404).send("User Name/Phone Number not provided");
+            return response.status(404).json({
+                errorMessage: "User Name/Phone Number not provided",
+                errorCode: 404
+            });
         }
     } catch (error) {
         console.error("Error sending OTP:", error);
-        return response.status(500).send("An error occurred while sending OTP");
+        return response.status(500).json({
+            errorMessage: "An error occurred while sending OTP",
+            errorCode: 500
+        });
     }
 };
+
 
 
 export const verifyOtp = async (request: Request, response: Response, next: NextFunction) => {
