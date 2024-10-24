@@ -7,15 +7,26 @@ import { cloudinaryImageUploadMethod } from '../config/multer';
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
    
   try {
-    const products = await AppDataSource.getRepository(Product).find();
-    for(let item of products){
+    const products = await AppDataSource.getRepository(Product).find({
+      order: {
+        productId: 'DESC',
+      },
+    });
+
+    for (let item of products) {
       if (Array.isArray(item.images)) {
         item.images = item.images.map(image => image);
       }
       let types = await AppDataSource.getRepository(Type).find({ where: { typeId: item.typeId } });
-        item['typeName'] = types[0].name
-      }
-    res.status(201).json(products);
+      item['typeName'] = types[0].name
+    }
+    const successRespone = {
+      data: products,
+      message: 'Products fetched successfully',
+      status: 201
+    }
+
+    res.status(201).send(successRespone);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
@@ -49,8 +60,13 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
     }
     const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isTodaysMenu } = req.body;
     const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isTodaysMenu,isTodaySpecl,createdAt: new Date() });
-    await AppDataSource.getRepository(Product).save(product);
-    res.status(201).json(product);
+    let updatedProduct = await AppDataSource.getRepository(Product).save(product);
+    const successRespone = {
+      data: updatedProduct,
+      message: 'Product created successfully',
+      status: 201
+    }
+    res.status(201).send(successRespone);
   } catch (error) {
     res.status(500).json({ message: 'Error creating product', error: error.message });
   }
