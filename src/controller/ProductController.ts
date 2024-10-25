@@ -8,6 +8,9 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
    
   try {
     const products = await AppDataSource.getRepository(Product).find({
+      where:{
+        isDeleted:0
+      },
       order: {
         productId: 'DESC',
       },
@@ -59,6 +62,9 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
       }
     }
     const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isTodaysMenu } = req.body;
+    if(!name || !price || !category || !typeId){
+      res.status(400).json({ message: 'All fields are required' });
+    }
     const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isTodaysMenu,isTodaySpecl,createdAt: new Date() });
     let updatedProduct = await AppDataSource.getRepository(Product).save(product);
     const successRespone = {
