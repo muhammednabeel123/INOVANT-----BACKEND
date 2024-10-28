@@ -3,14 +3,17 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 @Entity()
 export class Admin {
     @PrimaryGeneratedColumn()
-    id: number
+    adminId: number
 
-    @Column()
+    @Column({ nullable: true })
     firstName: string
 
-    @Column()
+    @Column({ nullable: true })
     lastName: string
 
-    @Column()
-    age: number
+    @Column({ default:0 })
+    isDeleted: number
+
+    @Column('bigint')
+    phoneNo: number
 }
