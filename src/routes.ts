@@ -2,8 +2,8 @@ import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProdu
 import express, { Request, Response } from "express";
 const router = express.Router();
 import { upload } from "./config/multer";
+import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, adminVerifyOtp } from "./controller/AdminController";
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
-import { getAdminById, getAllAdmins, removeAdmin, saveAdmin } from "./controller/AdminController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getOrderDetails } from './controller/OrderController';
 
@@ -21,10 +21,12 @@ router.get('/top-picks',getTopPicksProducts);
 router.get('/today-spcl',getTodaySpecialProducts);
 router.get('/types',getAllTypes);
 router.post('/delete-type',deleteType)
-router.get('/admins', getAllAdmins);
 
-router.get('/admins/:id', getAdminById);
-router.post('/admins', saveAdmin);
+router.get('/admins', getAllAdmins);
+router.post('/admin', saveAdmin);
+router.get('/admin/:id', getAdminById);
+router.post('/admin/send-otp', adminSendOtp);
+router.post('/admin/verify-otp', adminVerifyOtp);
 router.delete('/admins/:id', removeAdmin);
 
 router.get('/users', getAllUsers);
