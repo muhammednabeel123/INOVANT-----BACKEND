@@ -352,3 +352,39 @@ export const getAllOrders = async (request: Request, response: Response, next: N
     }
 };
 
+export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const orderId = parseInt(request.params.orderId);
+        const { productId, quantity, isProcessed } = request.body;
+
+        const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId: orderId } });
+        if (!order) {
+            return response.status(404).send("Order not found");
+        }
+
+        if (productId && quantity !== undefined) {
+            const orderItem = await AppDataSource.getRepository(OrderItems).findOne({
+                where: { orderId: orderId, productId: productId }
+            });
+
+            if (!orderItem) {
+                return response.status(404).send("Order item not found");
+            }
+
+            orderItem.quantity = quantity;
+            orderItem.updatedAt = new Date();
+            await AppDataSource.getRepository(OrderItems).save(orderItem);
+        }
+
+        if (isProcessed !== undefined) {
+            order.isProcessed = isProcessed;
+            order.updatedAt = new Date();
+            await AppDataSource.getRepository(Orders).save(order);
+        }
+
+        return response.status(200).send("Order updated successfully");
+    } catch (error) {
+        next(error);
+    }
+};
+
