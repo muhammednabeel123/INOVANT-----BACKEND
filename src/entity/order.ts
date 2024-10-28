@@ -14,7 +14,7 @@ export class Orders {
     userId: number
 
     @Column({ default: 0, nullable: true })
-    isProcessed:number
+    isProcessed: number
 
     @Column()
     createdAt: Date
@@ -25,9 +25,14 @@ export class Orders {
     @Column({
         type: 'enum',
         enum: ['U', 'T'],
-        default:'T',
+        default: 'T',
         nullable: true,
     })
     orderType: 'U' | 'D'
 
+    @Column({ default: 0, nullable: true })
+    isDeleted: number
+
+    @Column({ nullable: true })
+    statusId: number
 }

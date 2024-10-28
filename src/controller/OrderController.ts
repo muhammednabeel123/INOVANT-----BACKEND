@@ -6,6 +6,7 @@ import { Product } from "../entity/product";
 import { User } from "../entity/User";
 import Razorpay from "razorpay";
 import * as crypto from "crypto";
+import { Status } from "../entity/status";
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -174,7 +175,7 @@ export const checkout = async (request: Request, response: Response, next: NextF
         return response.status(201).json(updatedOrder);
     } catch (error) {
         return response.status(500).send("An error occurred while fetching order details");
-    }
+    }
 };
 
 
@@ -194,7 +195,7 @@ export const capturedOrder = async (request: Request, response: Response, next: 
         const { payload } = request.body;
 
         const orderId = parseInt(payload.payment.entity.notes.order_id);
-        
+
 
         if (request.body.event === 'payment.captured') {
 
@@ -328,7 +329,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
                 const product = await AppDataSource.getRepository(Product).findOne({
                     where: { productId: item.productId }
                 });
-                
+
                 const itemAmount = (parseInt(product?.price) || 0) * item.quantity;
                 totalAmount += itemAmount;
 
@@ -361,29 +362,16 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.params.orderId);
-        const { productId, quantity, isProcessed } = request.body;
+        const { isDeleted , statusId } = request.body;
 
         const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId: orderId } });
         if (!order) {
             return response.status(404).send("Order not found");
         }
 
-        if (productId && quantity !== undefined) {
-            const orderItem = await AppDataSource.getRepository(OrderItems).findOne({
-                where: { orderId: orderId, productId: productId }
-            });
-
-            if (!orderItem) {
-                return response.status(404).send("Order item not found");
-            }
-
-            orderItem.quantity = quantity;
-            orderItem.updatedAt = new Date();
-            await AppDataSource.getRepository(OrderItems).save(orderItem);
-        }
-
-        if (isProcessed !== undefined) {
-            order.isProcessed = isProcessed;
+        if (statusId !== undefined) {
+            order.statusId = statusId;
+            order.isDeleted = isDeleted;
             order.updatedAt = new Date();
             await AppDataSource.getRepository(Orders).save(order);
         }
@@ -394,3 +382,27 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
     }
 };
 
+
+export const listStatus = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const status = await AppDataSource.getRepository(Status).find({})
+        console.log(status, 'as')
+        let result = []
+        for (let item of status) {
+            let d = {
+                statusId: item.statusId,
+                name: item.name
+            }
+            result.push(d)
+        }
+        const successRespone = {
+            data: result,
+            status: 201,
+            message: 'successfully retrieved'
+        }
+        return response.status(201).send(successRespone)
+    } catch (error) {
+        console.log(error)
+        return response.status(500).send("An error occurred while fetching status details");
+    }
+}
