@@ -116,7 +116,7 @@ export const sendOtp = async (request: Request, response: Response, next: NextFu
         }
     } catch (error) {
         console.log(error);
-        
+
         return response.status(401).json({
             errorMessage: "An error occurred while sending OTP",
             errorCode: 401
@@ -161,10 +161,15 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
 
             return response.status(200).json({
                 message: "OTP verified successfully",
-                status:200,
+                status: 200,
                 token
             });
 
+        } else {
+            return response.status(401).json({
+                message: "OTP is not correct/valid",
+                status: 401,
+            });
         }
 
     } catch (error) {
