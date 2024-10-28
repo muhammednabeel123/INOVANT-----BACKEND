@@ -129,7 +129,7 @@ export const getOrderDetails = async (request: Request, response: Response, next
                 orderItemId: item.orderItemId,
                 productId: item.productId,
                 quantity: item.quantity,
-                image: product?.images ? `https://inovant.onrender.com/uploads/${product?.images}` : null,
+                image: product?.images,
                 name: product?.name,
                 price: product?.price
             }
@@ -146,6 +146,8 @@ export const getOrderDetails = async (request: Request, response: Response, next
     }
 };
 
+
+
 export const checkout = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.body.orderId);
@@ -153,40 +155,13 @@ export const checkout = async (request: Request, response: Response, next: NextF
         if (!order) {
             return response.status(404).send("Order not found");
         }
-
-        const razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_ID,
-            key_secret: process.env.RAZORPAY_SECRET,
-        });
-
-        const orderItems = await AppDataSource.getRepository(OrderItems).find({
-            where: { orderId },
-        });
-
-        const totalPrice = (await Promise.all(orderItems.map(async (curr) => {
-            const product = await AppDataSource.getRepository(Product).findOne({ where: { productId: curr.productId } });
-            return parseInt(product.price);
-        }))).reduce((acc, price) => acc + price, 0);
-
-        const options = {
-            amount: totalPrice * 100,
-            currency: 'INR',
-            receipt: String(order.orderId),
-            payment_capture: 1
-        };
-
-        const orderResponse = await razorpay.orders.create(options)
-
-        if (orderResponse) {
-            order.isProcessed = 2; // pending status
-            order.updatedAt = new Date();
-            const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
-            console.log(orderResponse)
-            return response.status(201).json(updatedOrder, orderResponse);
-        }
+        order.isProcessed = 1;
+        order.updatedAt = new Date();
+        const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
+        return response.status(201).json(updatedOrder);
     } catch (error) {
         return response.status(500).send("An error occurred while fetching order details");
-    }
+    }
 };
 
 
