@@ -4,6 +4,8 @@ import { Orders } from "../entity/order";
 import { OrderItems } from "../entity/orderItems";
 import { Product } from "../entity/product";
 import { User } from "../entity/User";
+import Razorpay from "razorpay";
+import * as crypto from "crypto";
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -151,12 +153,79 @@ export const checkout = async (request: Request, response: Response, next: NextF
         if (!order) {
             return response.status(404).send("Order not found");
         }
-        order.isProcessed = 1;
-        order.updatedAt = new Date();
-        const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
-        return response.status(201).json(updatedOrder);
+
+        const razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_ID,
+            key_secret: process.env.RAZORPAY_SECRET,
+        });
+
+        const orderItems = await AppDataSource.getRepository(OrderItems).find({
+            where: { orderId },
+        });
+
+        const totalPrice = (await Promise.all(orderItems.map(async (curr) => {
+            const product = await AppDataSource.getRepository(Product).findOne({ where: { productId: curr.productId } });
+            return parseInt(product.price);
+        }))).reduce((acc, price) => acc + price, 0);
+
+        const options = {
+            amount: totalPrice * 100,
+            currency: 'INR',
+            receipt: String(order.orderId),
+            payment_capture: 1
+        };
+
+        const orderResponse = await razorpay.orders.create(options)
+
+        if (orderResponse) {
+            order.isProcessed = 2; // pending status
+            order.updatedAt = new Date();
+            const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
+            console.log(orderResponse)
+            return response.status(201).json(updatedOrder, orderResponse);
+        }
     } catch (error) {
         return response.status(500).send("An error occurred while fetching order details");
+    }
+};
+
+
+
+export const capturedOrder = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const data = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+
+        data.update(JSON.stringify(request.body))
+
+        const digest = data.digest('hex')
+
+        if (digest !== request.headers['x-razorpay-signature']) {
+            return response.status(400).send("Invalid signature");
+        }
+
+        const { payload } = request.body;
+
+        const orderId = parseInt(payload.payment.entity.notes.order_id);
+        
+
+        if (request.body.event === 'payment.captured') {
+
+            const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId } });
+            if (!order) {
+                return response.status(404).send("Order not found");
+            }
+
+            order.isProcessed = 1; // Success
+            order.updatedAt = new Date();
+            const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
+
+            return response.status(200).json(updatedOrder);
+        } else {
+            return response.status(400).send("Unhandled event type");
+        }
+
+    } catch (error) {
+        next(error);
     }
 };
 
