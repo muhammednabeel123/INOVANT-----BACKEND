@@ -151,7 +151,7 @@ export const getOrderDetails = async (request: Request, response: Response, next
             data: result,
             message: "Order details fetched successfully",
             status: 201,
-            totalAmount:totalAmount
+            totalAmount: totalAmount
         }
         return response.status(201).send(successRespone)
     } catch (error) {
@@ -249,32 +249,34 @@ export const getOrdersByUserId = async (request: Request, response: Response, ne
 
         let result = [];
         for (let order of orders) {
-            const orderItems = await AppDataSource.getRepository(OrderItems).find({
-                where: { orderId: order.orderId }
-            });
-
-            let orderDetails = {
-                orderId: order.orderId,
-                orderNo: order.orderNo,
-                isProcessed: order.isProcessed,
-                createdAt: order.createdAt,
-                items: []
-            };
-
-            for (let item of orderItems) {
-                const product = await AppDataSource.getRepository(Product).findOne({
-                    where: { productId: item.productId }
+            if (order.isProcessed === 1) {
+                const orderItems = await AppDataSource.getRepository(OrderItems).find({
+                    where: { orderId: order.orderId }
                 });
-                orderDetails.items.push({
-                    orderItemId: item.orderItemId,
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    image: product?.images,
-                    name: product?.name,
-                    price: product?.price
-                });
+
+                let orderDetails = {
+                    orderId: order.orderId,
+                    orderNo: order.orderNo,
+                    isProcessed: order.isProcessed,
+                    createdAt: order.createdAt,
+                    items: []
+                };
+
+                for (let item of orderItems) {
+                    const product = await AppDataSource.getRepository(Product).findOne({
+                        where: { productId: item.productId }
+                    });
+                    orderDetails.items.push({
+                        orderItemId: item.orderItemId,
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        image: product?.images,
+                        name: product?.name,
+                        price: product?.price
+                    });
+                }
+                result.push(orderDetails);
             }
-            result.push(orderDetails);
         }
 
         return response.status(200).json({
@@ -302,50 +304,52 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 
         let result = [];
         for (let order of orders) {
-            const orderItems = await AppDataSource.getRepository(OrderItems).find({
-                where: { orderId: order.orderId }
-            });
-
-            const user = await AppDataSource.getRepository(User).findOne({
-                where: { userId: order.userId }
-            });
-
-            let orderDetails = {
-                orderId: order.orderId,
-                orderNo: order.orderNo,
-                isProcessed: order.isProcessed,
-                createdAt: order.createdAt,
-                updatedAt: order.updatedAt,
-                user: {
-                    userId: user?.userId,
-                    name: user?.firstName + ' ' + user?.lastName,
-                    email: user?.phoneNo
-                },
-                items: []
-            };
-
-            let totalAmount = 0;
-            for (let item of orderItems) {
-                const product = await AppDataSource.getRepository(Product).findOne({
-                    where: { productId: item.productId }
+            if (order.isProcessed === 1) {
+                const orderItems = await AppDataSource.getRepository(OrderItems).find({
+                    where: { orderId: order.orderId }
                 });
 
-                const itemAmount = (parseInt(product?.price) || 0) * item.quantity;
-                totalAmount += itemAmount;
-
-                orderDetails.items.push({
-                    orderItemId: item.orderItemId,
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    image: product?.images,
-                    name: product?.name,
-                    price: product?.price,
-                    itemTotal: itemAmount
+                const user = await AppDataSource.getRepository(User).findOne({
+                    where: { userId: order.userId }
                 });
+
+                let orderDetails = {
+                    orderId: order.orderId,
+                    orderNo: order.orderNo,
+                    isProcessed: order.isProcessed,
+                    createdAt: order.createdAt,
+                    updatedAt: order.updatedAt,
+                    user: {
+                        userId: user?.userId,
+                        name: user?.firstName + ' ' + user?.lastName,
+                        email: user?.phoneNo
+                    },
+                    items: []
+                };
+
+                let totalAmount = 0;
+                for (let item of orderItems) {
+                    const product = await AppDataSource.getRepository(Product).findOne({
+                        where: { productId: item.productId }
+                    });
+
+                    const itemAmount = (parseInt(product?.price) || 0) * item.quantity;
+                    totalAmount += itemAmount;
+
+                    orderDetails.items.push({
+                        orderItemId: item.orderItemId,
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        image: product?.images,
+                        name: product?.name,
+                        price: product?.price,
+                        itemTotal: itemAmount
+                    });
+                }
+
+                orderDetails['totalAmount'] = totalAmount;
+                result.push(orderDetails);
             }
-
-            orderDetails['totalAmount'] = totalAmount;
-            result.push(orderDetails);
         }
 
         return response.status(200).json({
@@ -362,7 +366,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.params.orderId);
-        const { isDeleted , statusId } = request.body;
+        const { isDeleted, statusId } = request.body;
 
         const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId: orderId } });
         if (!order) {
