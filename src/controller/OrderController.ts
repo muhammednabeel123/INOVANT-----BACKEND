@@ -30,7 +30,7 @@ export const createOrder = async (request: Request, response: Response, next: Ne
             });
 
             if (orderItem) {
-                orderItem.quantity += quantity;
+                orderItem.quantity = quantity;
                 orderItem.updatedAt = new Date();
             } else {
                 orderItem = new OrderItems();
