@@ -149,7 +149,7 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
                 code: otp
             });
 
-        if (verifiedResponse) {
+        if (verifiedResponse.valid) {
             const token = jwt.sign(
                 {
                     userId: user.userId,
