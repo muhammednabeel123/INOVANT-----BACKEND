@@ -26,7 +26,14 @@ export const createType = async (req: Request, res: Response): Promise<void> => 
 
 export const getAllTypes = async (req: Request, res: Response): Promise<void> => {
     try {
-        const types = await AppDataSource.getRepository(Type).find();
+        const types = await AppDataSource.getRepository(Type).find({
+            where:{
+                isDeleted:0
+              },
+              order: {
+                typeId: 'DESC',
+              },
+        });
         let result = [];
         for (let item of types) {
             let d = {
@@ -40,3 +47,21 @@ export const getAllTypes = async (req: Request, res: Response): Promise<void> =>
         res.status(500).json({ message: 'Error fetching types', error: error.message });
     }
 };
+
+export const deleteType = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.body;
+        const type = await AppDataSource.getRepository(Type).findOne({
+            where: { typeId: id }
+        });
+        if (!type) {
+            return res.status(404).json({ message: 'Type not found' });
+        }
+        type.isDeleted = 1;
+        await AppDataSource.getRepository(Type).save(type);
+        res.status(201).json({ message: 'Type marked as deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting type', error: error.message });
+    }
+};
+
