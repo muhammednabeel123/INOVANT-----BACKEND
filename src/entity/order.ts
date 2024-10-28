@@ -24,7 +24,7 @@ export class Orders {
 
     @Column({
         type: 'enum',
-        enum: ['U', 'T'], //U = User, T = Table
+        enum: ['U', 'T'],
         default:'T',
         nullable: true,
     })

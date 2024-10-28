@@ -4,6 +4,8 @@ import { Orders } from "../entity/order";
 import { OrderItems } from "../entity/orderItems";
 import { Product } from "../entity/product";
 import { User } from "../entity/User";
+import Razorpay from "razorpay";
+import * as crypto from "crypto";
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -134,7 +136,7 @@ export const getOrderDetails = async (request: Request, response: Response, next
                 orderItemId: item.orderItemId,
                 productId: item.productId,
                 quantity: item.quantity,
-                image: product?.images ? `https://inovant.onrender.com/uploads/${product?.images}` : null,
+                image: product?.images,
                 name: product?.name,
                 price: product?.price
             }
@@ -151,6 +153,8 @@ export const getOrderDetails = async (request: Request, response: Response, next
     }
 };
 
+
+
 export const checkout = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(request.body.orderId);
@@ -164,6 +168,46 @@ export const checkout = async (request: Request, response: Response, next: NextF
         return response.status(201).json(updatedOrder);
     } catch (error) {
         return response.status(500).send("An error occurred while fetching order details");
+    }
+};
+
+
+
+export const capturedOrder = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const data = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+
+        data.update(JSON.stringify(request.body))
+
+        const digest = data.digest('hex')
+
+        if (digest !== request.headers['x-razorpay-signature']) {
+            return response.status(400).send("Invalid signature");
+        }
+
+        const { payload } = request.body;
+
+        const orderId = parseInt(payload.payment.entity.notes.order_id);
+        
+
+        if (request.body.event === 'payment.captured') {
+
+            const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId } });
+            if (!order) {
+                return response.status(404).send("Order not found");
+            }
+
+            order.isProcessed = 1; // Success
+            order.updatedAt = new Date();
+            const updatedOrder = await AppDataSource.getRepository(Orders).save(order);
+
+            return response.status(200).json(updatedOrder);
+        } else {
+            return response.status(400).send("Unhandled event type");
+        }
+
+    } catch (error) {
+        next(error);
     }
 };
 
