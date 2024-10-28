@@ -129,6 +129,7 @@ export const getOrderDetails = async (request: Request, response: Response, next
             where: { orderId },
         });
         let result = []
+        let totalAmount = 0
         for (let item of orderItems) {
             const product = await AppDataSource.getRepository(Product).findOne({ where: { productId: item.productId } });
             let d = {
@@ -138,17 +139,22 @@ export const getOrderDetails = async (request: Request, response: Response, next
                 quantity: item.quantity,
                 image: product?.images,
                 name: product?.name,
-                price: product?.price
+                price: product?.price ? parseFloat(product?.price) : 0
+            }
+            if (typeof d.price === 'number') {
+                totalAmount += d.price;
             }
             result.push(d)
         }
         let successRespone = {
             data: result,
             message: "Order details fetched successfully",
-            status: 201
+            status: 201,
+            totalAmount:totalAmount
         }
         return response.status(201).send(successRespone)
     } catch (error) {
+        console.log(error)
         return response.status(500).send("An error occurred while fetching order details");
     }
 };
