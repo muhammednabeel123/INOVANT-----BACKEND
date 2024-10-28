@@ -227,3 +227,128 @@ export const cancelOrder = async (request: Request, response: Response, next: Ne
         next(error);
     }
 };
+
+export const getOrdersByUserId = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const userId = parseInt(request.params.userId);
+        const orders = await AppDataSource.getRepository(Orders).find({
+            where: { userId: userId },
+            order: { createdAt: 'DESC' }
+        });
+
+        if (!orders || orders.length === 0) {
+            return response.status(404).send("No orders found for this user");
+        }
+
+        let result = [];
+        for (let order of orders) {
+            const orderItems = await AppDataSource.getRepository(OrderItems).find({
+                where: { orderId: order.orderId }
+            });
+
+            let orderDetails = {
+                orderId: order.orderId,
+                orderNo: order.orderNo,
+                isProcessed: order.isProcessed,
+                createdAt: order.createdAt,
+                items: []
+            };
+
+            for (let item of orderItems) {
+                const product = await AppDataSource.getRepository(Product).findOne({
+                    where: { productId: item.productId }
+                });
+                orderDetails.items.push({
+                    orderItemId: item.orderItemId,
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    image: product?.images,
+                    name: product?.name,
+                    price: product?.price
+                });
+            }
+            result.push(orderDetails);
+        }
+
+        return response.status(200).json({
+            data: result,
+            message: "Orders fetched successfully",
+            status: 200
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const orders = await AppDataSource.getRepository(Orders).find({
+            order: { createdAt: 'DESC' }
+        });
+
+        if (!orders || orders.length === 0) {
+            return response.status(404).json({
+                message: "No orders found",
+                status: 404
+            });
+        }
+
+        let result = [];
+        for (let order of orders) {
+            const orderItems = await AppDataSource.getRepository(OrderItems).find({
+                where: { orderId: order.orderId }
+            });
+
+            const user = await AppDataSource.getRepository(User).findOne({
+                where: { userId: order.userId }
+            });
+
+            let orderDetails = {
+                orderId: order.orderId,
+                orderNo: order.orderNo,
+                isProcessed: order.isProcessed,
+                createdAt: order.createdAt,
+                updatedAt: order.updatedAt,
+                user: {
+                    userId: user?.userId,
+                    name: user?.firstName + ' ' + user?.lastName,
+                    email: user?.phoneNo
+                },
+                items: []
+            };
+
+            let totalAmount = 0;
+            for (let item of orderItems) {
+                const product = await AppDataSource.getRepository(Product).findOne({
+                    where: { productId: item.productId }
+                });
+                
+                const itemAmount = (parseInt(product?.price) || 0) * item.quantity;
+                totalAmount += itemAmount;
+
+                orderDetails.items.push({
+                    orderItemId: item.orderItemId,
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    image: product?.images,
+                    name: product?.name,
+                    price: product?.price,
+                    itemTotal: itemAmount
+                });
+            }
+
+            orderDetails['totalAmount'] = totalAmount;
+            result.push(orderDetails);
+        }
+
+        return response.status(200).json({
+            data: result,
+            message: "All orders fetched successfully",
+            status: 200,
+            totalOrders: result.length
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+

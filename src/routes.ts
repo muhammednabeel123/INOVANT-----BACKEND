@@ -5,7 +5,7 @@ import { upload } from "./config/multer";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, adminVerifyOtp } from "./controller/AdminController";
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
-import { addItemToOrder, cancelOrder, checkout, createOrder, getOrderDetails } from './controller/OrderController';
+import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId } from './controller/OrderController';
 
   
 router.get('/products',getAllProducts);
@@ -41,5 +41,7 @@ router.post('/order/item', addItemToOrder);
 router.get('/order/:orderId', getOrderDetails);
 router.post('/order/checkout',checkout);
 router.delete('/order/:orderId', cancelOrder);
+router.get('/orders', getAllOrders);
+router.get('/orders/:userId', getOrdersByUserId);
 
 export default router;
