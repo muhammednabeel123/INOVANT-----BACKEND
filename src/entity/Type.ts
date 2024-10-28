@@ -20,7 +20,7 @@ export class Type {
     images: string[];
 
     @Column({ nullable: true })
-    adminId: string;
+    adminId: number;
 }
 
 
