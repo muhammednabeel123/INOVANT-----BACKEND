@@ -19,8 +19,8 @@ export class Type {
     @Column('simple-array', { nullable: true })
     images: string[];
 
-    @ManyToOne(() => Admin)
-    adminId: Admin;
+    @Column({ nullable: true })
+    adminId: string;
 }
 
 

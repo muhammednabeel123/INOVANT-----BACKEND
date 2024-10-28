@@ -2,7 +2,7 @@ import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProdu
 import express, { Request, Response } from "express";
 const router = express.Router();
 import { upload } from "./config/multer";
-import { createType, getAllTypes } from "./controller/TypeController";
+import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin } from "./controller/AdminController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getOrderDetails } from './controller/OrderController';
@@ -20,6 +20,7 @@ router.put('/today-spcl-toggle/:id',todaySpclToggle);
 router.get('/top-picks',getTopPicksProducts);
 router.get('/today-spcl',getTodaySpecialProducts);
 router.get('/types',getAllTypes);
+router.post('/delete-type',deleteType)
 router.get('/admins', getAllAdmins);
 
 router.get('/admins/:id', getAdminById);
