@@ -6,8 +6,9 @@ import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, admin
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId, updateOrder, listStatus } from './controller/OrderController';
-import { changeServiceStatus, createService, getActiveServices, getAllServices } from './controller/serviceController';
+import { changeServiceStatus, createService, getActiveServices, getAllServices } from './controller/ServiceController';
 import { acceptBookingByAdmin, createBooking, deleteBooking, editBooking, getAllBookings, updateVisitedStatus } from './controller/BookingController';
+import { getAllBranches, getBranchById, getBranchesByAdminId, removeBranch, saveBranch, updateBranch } from './controller/BranchController';
 
   
 router.get('/products',getAllProducts);
@@ -30,6 +31,7 @@ router.get('/admin/:id', getAdminById);
 router.post('/admin/send-otp', adminSendOtp);
 router.post('/admin/verify-otp', adminVerifyOtp);
 router.delete('/admins/:id', removeAdmin);
+
 
 router.get('/users', getAllUsers);
 router.patch('/user', updateUser);
@@ -60,7 +62,14 @@ router.delete('/delete-booking/:id',deleteBooking);
 router.get('/bookings',getAllBookings);
 router.put('/accept-booking/:id',acceptBookingByAdmin);
 router.put('/visited-booking/:id',updateVisitedStatus);
+ 
+router.get('/branches', getAllBranches);
+router.post('/branch', saveBranch); // Create a new branch
+router.get('/branch/:id', getBranchById); // Get branch by ID
+router.put('/branch/:id', updateBranch); // Update a branch by ID
+router.delete('/branch/:id', removeBranch); // Remove a branch (soft delete)
+router.get('/branches/admin/:adminId', getBranchesByAdminId);
+
 
 
 export default router;
- 
