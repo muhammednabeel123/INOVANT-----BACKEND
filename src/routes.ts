@@ -1,11 +1,13 @@
 import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById, topPicksToggle, todaySpclToggle, getTopPicksProducts, getTodaySpecialProducts,} from './controller/ProductController';
 import express, { Request, Response } from "express";
 const router = express.Router();
-import { upload } from "./config/multer";
+import { upload, uploadSingle } from "./config/multer";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, adminVerifyOtp } from "./controller/AdminController";
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId, updateOrder, listStatus } from './controller/OrderController';
+import { changeServiceStatus, createService, getActiveServices, getAllServices } from './controller/serviceController';
+import { acceptBookingByAdmin, createBooking, deleteBooking, editBooking, getAllBookings, updateVisitedStatus } from './controller/BookingController';
 
   
 router.get('/products',getAllProducts);
@@ -47,4 +49,18 @@ router.post('/orders/:orderId', updateOrder);
 
 router.get('/get-status',listStatus)
 
+router.post('/add-service',uploadSingle,createService);
+router.put('/change-service-status/:id',changeServiceStatus);
+router.get('/services',getAllServices);
+router.get('/active-services',getActiveServices);
+
+router.post('/add-booking',createBooking);
+router.put('/edit-booking/:id',editBooking);
+router.delete('/delete-booking/:id',deleteBooking);
+router.get('/bookings',getAllBookings);
+router.put('/accept-booking/:id',acceptBookingByAdmin);
+router.put('/visited-booking/:id',updateVisitedStatus);
+
+
 export default router;
+ 

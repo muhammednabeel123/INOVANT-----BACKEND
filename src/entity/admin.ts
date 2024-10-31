@@ -16,4 +16,7 @@ export class Admin {
 
     @Column('bigint')
     phoneNo: number
+
+    @Column({ default: 0 })
+    isSuperAdmin: number
 }

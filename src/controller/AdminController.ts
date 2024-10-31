@@ -35,8 +35,8 @@ export const getAdminById = async (req: Request, res: Response): Promise<void> =
 // Save a new admin
 export const saveAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { firstName, lastName, phoneNo } = req.body;
-    const admin = Object.assign(new Admin(), { firstName, lastName, phoneNo });
+    const { firstName, lastName, phoneNo, isSuperAdmin } = req.body;
+    const admin = Object.assign(new Admin(), { firstName, lastName, phoneNo, isSuperAdmin });
 
     const savedAdmin = await AppDataSource.getRepository(Admin).save(admin);
 
@@ -97,8 +97,16 @@ export const adminSendOtp = async (request: Request, response: Response, next: N
       );
 
       if (!userUpdateResult) {
-        await AppDataSource.getRepository(Admin).save({
-          phoneNo: phoneNumber
+        return response.status(404).json({
+          errorMessage: "Admin not found with this phone number",
+          errorCode: 404
+        });
+      }
+
+      if (userUpdateResult.isDeleted === 1) {
+        return response.status(403).json({
+          errorMessage: "This admin account has been deleted",
+          errorCode: 403
         });
       }
 

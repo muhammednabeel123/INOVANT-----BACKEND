@@ -26,3 +26,4 @@ export const cloudinaryImageUploadMethod = async (file: any) => {
 }
 
 export const upload = multer({ storage: storage }).array('images');
+export const uploadSingle = multer({ storage: storage }).single('image');
