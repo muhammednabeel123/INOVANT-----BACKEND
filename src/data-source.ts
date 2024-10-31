@@ -8,6 +8,8 @@ import { Admin } from "./entity/admin";
 import { OrderItems } from "./entity/orderItems";
 import { Orders } from "./entity/order";
 import { Status } from "./entity/status";
+import { Booking } from "./entity/booking";
+import { Service } from "./entity/service";
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -17,7 +19,7 @@ export const AppDataSource = new DataSource({
     username: 'default',
     password: 'jMfIREP1nWe6',
     database: "verceldb",
-    entities: [User, Product,Type,Admin,OrderItems,Orders,Status],
+    entities: [User, Product,Type,Admin,OrderItems,Orders,Status,Booking,Service],
     synchronize: true,
     logging: false,
     ssl: true,
