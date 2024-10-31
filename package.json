@@ -28,7 +28,6 @@
    },
    "scripts": {
       "start": "nodemon src/index.ts",
-      "typeorm": "typeorm-ts-node-commonjs",
-      "build": "tsc"
+      "typeorm": "typeorm-ts-node-commonjs"
    }
 }
