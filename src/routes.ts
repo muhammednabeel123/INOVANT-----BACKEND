@@ -62,7 +62,7 @@ router.delete('/delete-booking/:id',deleteBooking);
 router.get('/bookings',getAllBookings);
 router.put('/accept-booking/:id',acceptBookingByAdmin);
 router.put('/visited-booking/:id',updateVisitedStatus);
- 
+
 router.get('/branches', getAllBranches);
 router.post('/branch', saveBranch); // Create a new branch
 router.get('/branch/:id', getBranchById); // Get branch by ID
@@ -73,3 +73,4 @@ router.get('/branches/admin/:adminId', getBranchesByAdminId);
 
 
 export default router;
+ 
