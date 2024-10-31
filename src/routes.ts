@@ -5,7 +5,7 @@ import { upload, uploadSingle } from "./config/multer";
 import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, adminVerifyOtp } from "./controller/AdminController";
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
-import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId, updateOrder, listStatus } from './controller/OrderController';
+import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId, updateOrder, listStatus, removeItemFromCart } from './controller/OrderController';
 import { changeServiceStatus, createService, getActiveServices, getAllServices } from './controller/ServiceController';
 import { acceptBookingByAdmin, createBooking, deleteBooking, editBooking, getAllBookings, updateVisitedStatus } from './controller/BookingController';
 
@@ -43,6 +43,7 @@ router.post('/order/item', addItemToOrder);
 router.get('/order/:orderId', getOrderDetails);
 router.post('/order/checkout',checkout);
 router.delete('/order/:orderId', cancelOrder);
+router.delete('/order/item/:orderItemId', removeItemFromCart);
 router.get('/orders', getAllOrders);
 router.get('/orders/:userId', getOrdersByUserId);
 router.post('/orders/:orderId', updateOrder);

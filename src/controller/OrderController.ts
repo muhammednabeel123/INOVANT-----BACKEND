@@ -386,6 +386,38 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
     }
 };
 
+export const removeItemFromCart = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const orderItemId = parseInt(request.params.orderItemId);
+
+        // Find the order item
+        const orderItem = await AppDataSource.getRepository(OrderItems).findOne({ where: { orderItemId } });
+
+        if (!orderItem) {
+            return response.status(404).json({ status: 404, message: "Order item not found" });
+        }
+
+        // Find the associated order
+        const order = await AppDataSource.getRepository(Orders).findOne({ where: { orderId: orderItem.orderId } });
+
+        if (!order) {
+            return response.status(404).json({ status: 404, message: "Order not found" });
+        }
+
+        // Check if the order is not processed
+        if (order.isProcessed !== 0) {
+            return response.status(400).json({ status: 400, message: "Cannot remove item from a processed order" });
+        }
+
+        // Remove the order item
+        await AppDataSource.getRepository(OrderItems).remove(orderItem);
+
+        return response.status(200).json({ status: 200, message: "Order item removed successfully" });
+    } catch (error) {
+        response.status(500).json({ status: 500, message: "Error removing order item", error: error.message });
+    }
+};
+
 
 export const listStatus = async (request: Request, response: Response, next: NextFunction) => {
     try {
