@@ -32,21 +32,77 @@ export const one = async (request: Request, response: Response, next: NextFuncti
 };
 
 export const updateUser = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId, firstName, lastName, age, phoneNo } = request.body;
+    try {
+        const { userId, firstName, lastName, age, phoneNo, pinCode, address, userName } = request.body;
 
-    const user = Object.assign(new User(), {
-        firstName,
-        lastName,
-        age,
-        phoneNo
-    });
+        // Check if userId is provided
+        if (!userId) {
+            return response.status(400).json({
+                message: "UserId is required",
+                status: 400
+            });
+        }
 
-    const userSaved = AppDataSource.getRepository(User).update({ userId: userId }, user);
-    if (userSaved) {
-        response.status(200).send(userSaved)
+        // Find the user by ID
+        const existingUser = await AppDataSource.getRepository(User).findOne({ where: { userId } });
+
+        if (!existingUser) {
+            return response.status(404).json({
+                message: "User not found",
+                status: 404
+            });
+        }
+
+        // Update only the fields that are provided in the request body
+        if (firstName) {
+            existingUser.firstName = firstName;
+        }
+        if (lastName) {
+            existingUser.lastName = lastName;
+        }
+        if (age) {
+            existingUser.age = age;
+        }
+        if (phoneNo) {
+            existingUser.phoneNo = phoneNo;
+        }
+        if (pinCode) {
+            existingUser.pincode = pinCode;
+        }
+        if (address) {
+            existingUser.address = address;
+        }
+        if (userName) {
+            existingUser.userName = userName;
+        }
+
+        // Save the updated user
+        const userSaved = await AppDataSource.getRepository(User).save(existingUser);
+
+        if (!userSaved) {
+            return response.status(500).json({
+                message: "Failed to update user",
+                status: 500
+            });
+        }
+
+        // Send success response
+        const successResponse = {
+            data: userSaved,
+            status: 200,
+            message: 'User updated successfully'
+        };
+        return response.status(200).json(successResponse);
+
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return response.status(500).json({
+            message: "An error occurred while updating user",
+            status: 500,
+            error: error.message
+        });
     }
-
-};
+}
 
 export const removeUser = async (request: Request, response: Response, next: NextFunction) => {
     try {

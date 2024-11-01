@@ -30,6 +30,9 @@ export class Product {
   @Column({ nullable: true })
   adminId: number;
 
+  @Column({nullable:true,default:0})
+  branchId:number
+
   @Column({ default: 0, nullable: true })
   isDeleted: number;
 

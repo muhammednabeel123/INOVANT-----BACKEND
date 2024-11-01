@@ -3,6 +3,9 @@ import { Product } from '../entity/product';
 import { AppDataSource } from '../data-source';
 import { Type } from '../entity/Type';
 import { cloudinaryImageUploadMethod } from '../config/multer';
+import { Branch } from '../entity/branch';
+import { User } from '../entity/User';
+import { In } from 'typeorm';
 
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
    
@@ -30,6 +33,77 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
     }
 
     res.status(201).send(successRespone);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching products', error: error.message });
+  }
+};
+
+export const getAllProductsByUserId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    // Check if userId is provided
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required', status: 400 });
+    }
+
+    // Fetch user to get the pinCode
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { userId: userId, isDeleted: 0 }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'No user found for the given user ID', status: 404 });
+    }
+
+    const userPinCode = user.pincode;
+
+    // Fetch branches matching the user's pinCode
+    const branches = await AppDataSource.getRepository(Branch).find({
+      where: { pincode: userPinCode, isDeleted: 0 }
+    });
+
+    // Log branches for debugging
+
+    if (branches.length === 0) {
+      return res.status(404).json({ message: 'No branches found for the given pinCode', status: 404 });
+    }
+
+    const branchIds = branches.map(branch => branch.branchId);
+    branchIds.push(0)
+    console.log("Branch IDs:", branchIds);
+
+    // Fetch products that match branch IDs or have branchId as null
+    const products = await AppDataSource.getRepository(Product).find({
+      where: [
+        // { isDeleted: 0, branchId: null }, // Products without a branchId
+        { isDeleted: 0, branchId: In(branchIds) } // Products with matching branchIds
+      ],
+      order: {
+        productId: 'DESC',
+      },
+    });
+
+    // Log products for debugging
+    // console.log("Fetched Products:", products);
+
+    // Enrich products with type information
+    for (let item of products) {
+      console.log("Product Name:", item.name, "Branch ID:", item.branchId); // Debugging log
+      if (Array.isArray(item.images)) {
+        item.images = item.images.map(image => image);
+      }
+      let types = await AppDataSource.getRepository(Type).find({ where: { typeId: item.typeId } });
+      item['typeName'] = types[0]?.name; // Safely access the type name
+    }
+
+    const successResponse = {
+      data: products,
+      message: 'Products fetched successfully',
+      status: 201
+    };
+
+    res.status(201).send(successResponse);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }

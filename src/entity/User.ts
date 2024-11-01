@@ -17,7 +17,16 @@ export class User {
     @Column({ nullable: true })
     age: number
 
-    @Column('bigint')
-    phoneNo: number
+    @Column({nullable:true})
+    phoneNo: string
+
+    @Column({nullable:true})
+    address:string
+
+    @Column({nullable:true})
+    pincode:string
+
+    @Column({default:0})
+    isDeleted:number
 
 }

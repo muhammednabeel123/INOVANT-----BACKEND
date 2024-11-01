@@ -1,4 +1,4 @@
-import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById, topPicksToggle, todaySpclToggle, getTopPicksProducts, getTodaySpecialProducts,} from './controller/ProductController';
+import {createProduct,deleteProduct, getAllProducts, getProductById, deleteProductImage, updateProductById, topPicksToggle, todaySpclToggle, getTopPicksProducts, getTodaySpecialProducts, getAllProductsByUserId,} from './controller/ProductController';
 import express, { Request, Response } from "express";
 const router = express.Router();
 import { upload, uploadSingle } from "./config/multer";
@@ -18,6 +18,7 @@ router.delete('/products/:id', deleteProduct);
 router.delete('/products/:id/images/:imageId', deleteProductImage);
 router.put('/edit-products/:id',upload,updateProductById);
 router.post('/add-type',upload,createType);
+router.get('/products/user/:userId', getAllProductsByUserId);
 router.put('/top-picks-toggle/:id',topPicksToggle);
 router.put('/today-spcl-toggle/:id',todaySpclToggle);
 router.get('/top-picks',getTopPicksProducts);
