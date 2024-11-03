@@ -313,12 +313,19 @@ export const getAllOrders = async (request: Request, response: Response, next: N
                     where: { userId: order.userId }
                 });
 
+                const status = await AppDataSource.getRepository(Status).findOne({
+                    where:{
+                        statusId: order.statusId
+                    }
+                })
+
                 let orderDetails = {
                     orderId: order.orderId,
                     orderNo: order.orderNo,
                     isProcessed: order.isProcessed,
                     createdAt: order.createdAt,
                     updatedAt: order.updatedAt,
+                    status:status.name ? status.name : '',
                     user: {
                         userId: user?.userId,
                         name: user?.firstName + ' ' + user?.lastName,
@@ -345,6 +352,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
                         price: product?.price,
                         itemTotal: itemAmount
                     });
+                    
                 }
 
                 orderDetails['totalAmount'] = totalAmount;
