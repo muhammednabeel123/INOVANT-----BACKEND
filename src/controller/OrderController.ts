@@ -253,12 +253,18 @@ export const getOrdersByUserId = async (request: Request, response: Response, ne
                 const orderItems = await AppDataSource.getRepository(OrderItems).find({
                     where: { orderId: order.orderId }
                 });
+                const status = await AppDataSource.getRepository(Status).findOne({
+                    where:{
+                        statusId: order.statusId
+                    }
+                })
 
                 let orderDetails = {
                     orderId: order.orderId,
                     orderNo: order.orderNo,
                     isProcessed: order.isProcessed,
                     createdAt: order.createdAt,
+                    status:status.name ? status.name : '',
                     items: []
                 };
 
