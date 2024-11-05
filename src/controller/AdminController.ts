@@ -166,7 +166,6 @@ export const adminVerifyOtp = async (request: Request, response: Response, next:
         {
           userId: user.adminId,
           phoneNo: user.phoneNo,
-          role: 'admin'
         },
         process.env.JWT_SECRET
       );

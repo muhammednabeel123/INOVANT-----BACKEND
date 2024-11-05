@@ -211,7 +211,6 @@ export const verifyOtp = async (request: Request, response: Response, next: Next
                     userId: user.userId,
                     phoneNo: user.phoneNo,
                     userName: user.userName,
-                    role: 'user'
                 },
                 process.env.JWT_SECRET
             );
