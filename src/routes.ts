@@ -6,7 +6,7 @@ import { getAdminById, getAllAdmins, removeAdmin, saveAdmin, adminSendOtp, admin
 import { createType, deleteType, getAllTypes } from "./controller/TypeController";
 import { getAllUsers, removeUser, updateUser, sendOtp, verifyOtp } from './controller/UserController';
 import { addItemToOrder, cancelOrder, checkout, createOrder, getAllOrders, getOrderDetails, getOrdersByUserId, updateOrder, listStatus, removeItemFromCart } from './controller/OrderController';
-import { changeServiceStatus, createService, getActiveServices, getAllServices } from './controller/ServiceController';
+import { changeServiceStatus, createService, getActiveServices, getAllServices, updateService } from './controller/ServiceController';
 import { acceptBookingByAdmin, createBooking, deleteBooking, editBooking, getAllBookings, updateVisitedStatus } from './controller/BookingController';
 import { getAllBranches, getBranchById, getBranchesByAdminId, removeBranch, saveBranch, updateBranch } from './controller/BranchController';
 
