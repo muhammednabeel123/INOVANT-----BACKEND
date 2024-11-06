@@ -57,6 +57,7 @@ router.post('/add-service',uploadSingle,createService);
 router.put('/change-service-status/:id',changeServiceStatus);
 router.get('/services',getAllServices);
 router.get('/active-services',getActiveServices);
+router.put('/edit-service/:id', uploadSingle, updateService);
 
 router.post('/add-booking',createBooking);
 router.put('/edit-booking/:id',editBooking);
