@@ -132,6 +132,7 @@ export const removeAdmin = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
+
 export const adminSendOtp = async (request: Request, response: Response, next: NextFunction) => {
   const { phoneNumber } = request.body;
 
@@ -238,3 +239,4 @@ export const adminVerifyOtp = async (request: Request, response: Response, next:
     return response.status(500).send("An error occurred while verifying OTP");
   }
 };
+
