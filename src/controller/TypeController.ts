@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { Type } from '../entity/Type';
-import { cloudinaryImageUploadMethod } from '../config/multer';
 
 export const createType = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -10,9 +9,10 @@ export const createType = async (req: Request, res: Response): Promise<void> => 
         // Check if files are present
         if (req.files && Array.isArray(req.files)) {
             for (const file of req.files) {
-                const { path } = file
-                const newPath = await cloudinaryImageUploadMethod(path)
-                imageUpload.push(newPath);
+                const { path } = file;
+                const adjustedPath = path.replace(/^src\//, '');
+                const url = `${process.env.BACKEND_STATICFILES_URL}/${adjustedPath}`;
+                imageUpload.push(url);
             }
         }
         const { name } = req.body;

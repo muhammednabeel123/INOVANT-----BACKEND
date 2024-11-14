@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
-import { Product } from '../entity/product'; 
+import { Product } from '../entity/product';
 import { AppDataSource } from '../data-source';
 import { Type } from '../entity/Type';
-import { cloudinaryImageUploadMethod } from '../config/multer';
 import { Branch } from '../entity/branch';
 import { User } from '../entity/User';
 import { In } from 'typeorm';
 
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
-   
+
   try {
     const products = await AppDataSource.getRepository(Product).find({
-      where:{
-        isDeleted:0
+      where: {
+        isDeleted: 0
       },
       order: {
         productId: 'DESC',
@@ -126,21 +125,22 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const imageUpload = [];
-  
+
     // Check if files are present
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files) {
         const { path } = file
-        const newPath = await cloudinaryImageUploadMethod(path)
-        imageUpload.push(newPath);
+        const adjustedPath = path.replace(/^src\//, '');
+        const url = `${process.env.BACKEND_STATICFILES_URL}/${adjustedPath}`;
+        imageUpload.push(url);
       }
     }
-    const { name, price, category, typeId,description,isDeleted, isActive,isTodaySpecl,isTodaysMenu } = req.body;
-    if(!name || !price || !category || !typeId){
+    const { name, price, category, typeId, description, isDeleted, isActive, isTodaySpecl, isTodaysMenu } = req.body;
+    if (!name || !price || !category || !typeId) {
       res.status(400).json({ message: 'All fields are required' });
       return;
     }
-    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId,description,isDeleted, isActive,isTodaysMenu,isTodaySpecl,createdAt: new Date() });
+    const product = AppDataSource.getRepository(Product).create({ name, price, images: imageUpload, category, typeId, description, isDeleted, isActive, isTodaysMenu, isTodaySpecl, createdAt: new Date() });
     let updatedProduct = await AppDataSource.getRepository(Product).save(product);
     const successRespone = {
       data: updatedProduct,
@@ -174,7 +174,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
 
 export const deleteProductImage = async (req: Request, res: Response): Promise<void> => {
   try {
-   
+
     const productId = req.params.id;
     const imageUrlToDelete = req.params.imageId;
     const productRepository = AppDataSource.getRepository(Product);
@@ -191,7 +191,7 @@ export const deleteProductImage = async (req: Request, res: Response): Promise<v
     res.status(500).json({ message: 'Error deleting product image', error: error.message });
   }
 
-  
+
 };
 
 export const updateProductById = async (req: Request, res: Response): Promise<void> => {
@@ -223,22 +223,23 @@ export const updateProductById = async (req: Request, res: Response): Promise<vo
       const imageUpload = [];
       for (let i = 0; i < req.files.length; i++) {
         const { path } = req.files[i];
-        const newPath = await cloudinaryImageUploadMethod(path)
-        imageUpload[i] = newPath;
-        productToUpdate.images.push(imageUpload[i]) ;
-      }   
+        const adjustedPath = path.replace(/^src\//, '');
+        const url = `${process.env.BACKEND_STATICFILES_URL}/${adjustedPath}`;
+        imageUpload[i] = url;
+        productToUpdate.images.push(imageUpload[i]);
+      }
     }
-    if(req.body.isDeleted){
+    if (req.body.isDeleted) {
       productToUpdate.isDeleted = req.body.isDeleted;
     }
-    if(req.body.isActive){
+    if (req.body.isActive) {
       productToUpdate.isActive = req.body.isActive;
     }
-    if(req.body.isTodaySpecl){
+    if (req.body.isTodaySpecl) {
       productToUpdate.isTodaySpecl = req.body.isTodaySpecl;
     }
-    if(req.body.isFeatured){
-      productToUpdate.isTodaysMenu  = req.body.isTodaysMenu;
+    if (req.body.isFeatured) {
+      productToUpdate.isTodaysMenu = req.body.isTodaysMenu;
     }
 
     await productRepository.save(productToUpdate);
@@ -285,7 +286,7 @@ export const todaySpclToggle = async (req: Request, res: Response): Promise<void
 
 export const getTopPicksProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaysMenu: 1 } });
+    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaysMenu: 1, isDeleted: 0 } });
     res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching top picks products', error: error.message });
@@ -294,7 +295,7 @@ export const getTopPicksProducts = async (req: Request, res: Response): Promise<
 
 export const getTodaySpecialProducts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaySpecl: 1 } });
+    const products = await AppDataSource.getRepository(Product).find({ where: { isTodaySpecl: 1, isDeleted: 0 } });
     res.status(201).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching today special products', error: error.message });

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { Service } from '../entity/service';
 import { AppDataSource } from '../data-source';
-import { cloudinaryImageUploadMethod } from '../config/multer';
 
 // Create a new service with image upload
 export const createService = async (req: Request, res: Response): Promise<void> => {
@@ -10,7 +9,9 @@ export const createService = async (req: Request, res: Response): Promise<void> 
 
     if (req.file) {
       const { path } = req.file;
-      imageUrl = await cloudinaryImageUploadMethod(path) as string;
+      const adjustedPath = path.replace(/^src\//, '');
+      const url = `${process.env.BACKEND_STATICFILES_URL}/${adjustedPath}`;
+      imageUrl = url;
     }
 
     const { title, description } = req.body;
@@ -35,7 +36,9 @@ export const updateService = async (req: Request, res: Response): Promise<void> 
 
     if (req.file) {
       const { path } = req.file;
-      serviceToUpdate.img = await cloudinaryImageUploadMethod(path) as string;
+      const adjustedPath = path.replace(/^src\//, '');
+      const url = `${process.env.BACKEND_STATICFILES_URL}/${adjustedPath}`;
+      serviceToUpdate.img = url;
     }
 
     const { title, description } = req.body;
