@@ -12,20 +12,11 @@ const app = express()
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 dotenv.config();
-const allowedOrigins = ['https://chuli.y-i.app', 'https://chuli-admin.y-i.app', 'https://chuli-backend.y-i.app'];
 
 app.use(
   cors({
-    credentials: true,
-    origin: function (origin, callback) {
-      // Check if the incoming origin is in the list of allowed origins
-      if (allowedOrigins.includes(origin) || !origin) {
-        console.log(origin)
-        callback(null, true); // Allow the request if the origin is in the allowed list
-      } else {
-        callback(new Error('Not allowed by CORS')); // Block the request if the origin is not allowed
-      }
-    },
+    credentials: true, // Enable credentials support
+    origin: true, // Allow all origins
   })
 );
 
