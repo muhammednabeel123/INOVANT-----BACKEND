@@ -335,7 +335,9 @@ export const getAllOrders = async (request: Request, response: Response, next: N
                     user: {
                         userId: user?.userId,
                         name: user?.firstName + ' ' + user?.lastName,
-                        email: user?.phoneNo
+                        phoneNo: user?.phoneNo,
+                        address: user.address,
+                        pincode: user.pincode
                     },
                     items: []
                 };

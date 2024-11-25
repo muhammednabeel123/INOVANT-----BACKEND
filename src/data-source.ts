@@ -17,10 +17,10 @@ export const AppDataSource = new DataSource({
     type: "postgres",
     host: process.env.HOST,
     port: 5432,
-    username: 'default',
-    password: 'jMfIREP1nWe6',
-    database: "verceldb",
-    entities: [User, Product,Type,Admin,OrderItems,Orders,Status,Booking,Service,Branch],
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+    entities: [User, Product, Type, Admin, OrderItems, Orders, Status, Booking, Service, Branch],
     synchronize: true,
     logging: false,
     ssl: true,
@@ -30,5 +30,5 @@ export const AppDataSource = new DataSource({
         }
     },
     migrations: [],
-    subscribers: [],
+    subscribers: [],
 })
