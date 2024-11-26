@@ -10,7 +10,9 @@ const client = require('twilio')(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
 
 export const getAllAdmins = async (req: Request, res: Response): Promise<void> => {
   try {
-    const admins = await AppDataSource.getRepository(Admin).find();
+    const admins = await AppDataSource.getRepository(Admin).find({
+      where: { isDeleted: 0 }
+    });
     res.status(200).json(admins);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching admins', error: error.message });
@@ -20,7 +22,12 @@ export const getAllAdmins = async (req: Request, res: Response): Promise<void> =
 export const getAdminById = async (req: Request, res: Response): Promise<void> => {
   try {
     const adminId = parseInt(req.params.id);
-    const admin = await AppDataSource.getRepository(Admin).findOne({ where: { adminId } });
+    const admin = await AppDataSource.getRepository(Admin).findOne({ 
+      where: { 
+        adminId,
+        isDeleted: 0 
+      } 
+    });
 
     if (!admin) {
       res.status(404).json({ message: 'Admin not found' });
