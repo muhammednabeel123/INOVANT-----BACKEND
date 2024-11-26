@@ -17,7 +17,9 @@ export const getAllBranches = async (req: Request, res: Response): Promise<void>
                   isDeleted:0
               }
           })
-          item['adminName'] = admin.firstName ? admin.firstName : '' + '' + admin.lastName ? admin.lastName : ""
+          item['adminName'] = admin ? 
+            `${admin?.firstName || ''} ${admin?.lastName || ''}`.trim() : 
+            '';
       }
     const successResponse = {
       data: branches,
@@ -44,7 +46,10 @@ export const getBranchById = async (req: Request, res: Response): Promise<void> 
         res.status(404).json({ message: 'Branch not found' });
         return;
     }
-    branch['adminName'] =  admin.firstName?admin.firstName :''  + '' + admin.lastName ?admin.lastName : "" 
+
+    branch['adminName'] = admin ? 
+    `${admin?.firstName || ''} ${admin?.lastName || ''}`.trim() : 
+    '';
 
     const successResponse = {
       data: branch,
