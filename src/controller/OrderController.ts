@@ -143,7 +143,7 @@ export const getOrderDetails = async (request: Request, response: Response, next
                 price: product?.price ? parseFloat(product?.price) : 0
             }
             if (typeof d.price === 'number') {
-                totalAmount += d.price;
+                totalAmount += d.price * d.quantity;
             }
             result.push(d)
         }
