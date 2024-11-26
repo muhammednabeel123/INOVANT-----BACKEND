@@ -48,7 +48,19 @@ export const saveAdmin = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    
+
+    const existingAdminWithUserName = await AppDataSource.getRepository(Admin).findOne({
+      where: { phoneNo }
+    });
+
+    if (existingAdminWithUserName) {
+      res.status(409).json({
+        message: 'An admin with this phone number already exists',
+        status: 409
+      });
+      return;
+    }
+
     const admin = Object.assign(new Admin(), { firstName, lastName, phoneNo, isSuperAdmin });
 
     const savedAdmin = await AppDataSource.getRepository(Admin).save(admin);
